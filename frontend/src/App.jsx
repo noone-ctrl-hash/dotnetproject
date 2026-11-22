@@ -1,6 +1,6 @@
 import { Navigate, NavLink, Route, Routes, useLocation, Link } from 'react-router-dom'
 import { useAuth } from './auth.jsx'
-import { Spinner } from './components/ui.jsx'
+import { BrandMark, Spinner } from './components/ui.jsx'
 import Catalog from './pages/Catalog.jsx'
 import BookDetails from './pages/BookDetails.jsx'
 import Reader from './pages/Reader.jsx'
@@ -16,7 +16,7 @@ function Navbar() {
   return (
     <header className="nav">
       <div className="nav-inner">
-        <Link to="/" className="brand">Bibliothèque</Link>
+        <Link to="/" className="brand"><BrandMark />Bibliothèque</Link>
         <nav className="nav-links">
           <NavLink to="/" end>Catalogue</NavLink>
           <NavLink to="/publications">Communauté</NavLink>

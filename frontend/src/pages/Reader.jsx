@@ -9,8 +9,19 @@ export default function Reader() {
   const [error, setError] = useState(null)
   const [size, setSize] = useState(19)
   const [serif, setSerif] = useState(false)
+  const [progress, setProgress] = useState(0)
 
   useEffect(() => { api.get(`/books/${id}/read`).then(setBook).catch(setError) }, [id])
+
+  useEffect(() => {
+    const onScroll = () => {
+      const max = document.documentElement.scrollHeight - window.innerHeight
+      setProgress(max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0)
+    }
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [book])
 
   if (error) return (
     <Empty title={error.status === 403 ? 'Ce livre n’est pas encore à vous' : 'Lecture impossible'} hint={error.message}>
@@ -21,6 +32,7 @@ export default function Reader() {
 
   return (
     <div className="reader">
+      <div className="read-progress" role="progressbar" aria-valuenow={Math.round(progress * 100)} aria-valuemin={0} aria-valuemax={100}><i style={{ transform: `scaleX(${progress})` }} /></div>
       <div className="reader-bar">
         <Link to={`/livres/${id}`} className="back">‹ {book.title}</Link>
         <div className="row gap">
@@ -29,7 +41,7 @@ export default function Reader() {
           <button className={`btn ghost sm ${serif ? 'on' : ''}`} onClick={() => setSerif(!serif)}>Serif</button>
         </div>
       </div>
-      <article className="reader-text" style={{ fontSize: size, fontFamily: serif ? 'ui-serif, Georgia, "New York", serif' : undefined }}>
+      <article className="reader-text" style={{ fontSize: size, fontFamily: serif ? 'var(--serif)' : undefined }}>
         <h1>{book.title}</h1>
         <p className="lead">{book.author}</p>
         {book.content.split('\n\n').map((para, i) =>

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { api, dateFr, money } from '../api.js'
 import { useAuth } from '../auth.jsx'
-import { Cover, Empty, Modal, Spinner } from '../components/ui.jsx'
+import { Cover, Empty, Modal, Spinner, Tilt, coverGlow } from '../components/ui.jsx'
 import { useToast } from '../components/Toast.jsx'
 
 /** Séquence : Cliquer sur « Acheter » → Purchase(bookId) → interface de paiement → ProcessPayment(bookId) */
@@ -82,7 +82,8 @@ export default function BookDetails() {
 
   return (
     <div className="details">
-      <Cover book={book} size="lg" />
+      <div className="details-glow" style={coverGlow(book)} />
+      <Tilt><Cover book={book} size="lg" /></Tilt>
       <div className="details-body">
         <Link to="/" className="back">‹ Catalogue</Link>
         <h1>{book.title}</h1>

@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth.jsx'
+import { BrandMark } from '../components/ui.jsx'
 
 function AuthShell({ title, subtitle, children, footer }) {
   return (
     <div className="auth">
       <div className="auth-card">
+        <BrandMark />
         <h1>{title}</h1>
         <p className="muted">{subtitle}</p>
         {children}

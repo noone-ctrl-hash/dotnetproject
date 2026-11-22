@@ -11,10 +11,10 @@ ChartJS.defaults.color = '#98989d'
 ChartJS.defaults.font.family = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter Variable", Inter, sans-serif'
 ChartJS.defaults.borderColor = 'rgba(255,255,255,0.07)'
 
-const PALETTE = ['#0a84ff', '#30d158', '#ff9f0a', '#bf5af2', '#ff375f', '#64d2ff']
+const PALETTE = ['#e9c27b', '#8fa0ff', '#34d399', '#ff8a7a', '#c08bff', '#64d2ff']
 const STATUS_LABEL = { Success: 'Réussis', Failed: 'Refusés', Cancelled: 'Annulés', Pending: 'En attente' }
-const STATUS_COLOR = { Success: '#30d158', Failed: '#ff453a', Cancelled: '#ff9f0a', Pending: '#8e8e93' }
-const tooltip = { backgroundColor: '#2c2c2e', titleColor: '#fff', bodyColor: '#e5e5ea', padding: 10, cornerRadius: 10, displayColors: false }
+const STATUS_COLOR = { Success: '#34d399', Failed: '#ff6b61', Cancelled: '#ffa94d', Pending: '#8e8e93' }
+const tooltip = { backgroundColor: 'rgba(30,30,34,.96)', borderColor: 'rgba(255,255,255,.12)', borderWidth: 1, titleColor: '#fff', bodyColor: '#e5e5ea', padding: 10, cornerRadius: 10, displayColors: false }
 const base = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip } }
 const grid = { grid: { color: 'rgba(255,255,255,0.06)' }, border: { display: false } }
 
@@ -46,24 +46,24 @@ export default function AdminDashboard() {
           <Line options={{ ...base, scales: { x: { ...grid, ticks: { maxTicksLimit: 8 } }, y: { ...grid, beginAtZero: true } } }}
             data={{
               labels: s.revenueByDay.map((d) => d.date.slice(5)),
-              datasets: [{ data: s.revenueByDay.map((d) => d.revenue), borderColor: '#0a84ff', backgroundColor: 'rgba(10,132,255,0.15)', fill: true, tension: 0.35, pointRadius: 0, pointHoverRadius: 5, borderWidth: 2.5 }]
+              datasets: [{ data: s.revenueByDay.map((d) => d.revenue), borderColor: '#e9c27b', backgroundColor: 'rgba(233,194,123,0.14)', fill: true, tension: 0.35, pointRadius: 0, pointHoverRadius: 5, borderWidth: 2.5 }]
             }} />
         </Panel>
         <Panel title="Ventes par catégorie">
           <Doughnut options={{ ...base, cutout: '68%', plugins: { ...base.plugins, legend: { display: true, position: 'bottom', labels: { boxWidth: 10, usePointStyle: true } } } }}
-            data={{ labels: s.byCategory.map((c) => c.category), datasets: [{ data: s.byCategory.map((c) => c.sales), backgroundColor: PALETTE, borderColor: '#1c1c1e', borderWidth: 3 }] }} />
+            data={{ labels: s.byCategory.map((c) => c.category), datasets: [{ data: s.byCategory.map((c) => c.sales), backgroundColor: PALETTE, borderColor: '#141416', borderWidth: 3 }] }} />
         </Panel>
         <Panel title="Livres les plus vendus">
           <Bar options={{ ...base, indexAxis: 'y', scales: { x: { ...grid, beginAtZero: true, ticks: { precision: 0 } }, y: { grid: { display: false }, border: { display: false } } } }}
-            data={{ labels: s.topBooks.map((b) => b.title), datasets: [{ data: s.topBooks.map((b) => b.sales), backgroundColor: '#30d158', borderRadius: 8, maxBarThickness: 22 }] }} />
+            data={{ labels: s.topBooks.map((b) => b.title), datasets: [{ data: s.topBooks.map((b) => b.sales), backgroundColor: '#e9c27b', borderRadius: 8, maxBarThickness: 22 }] }} />
         </Panel>
         <Panel title="Statut des paiements">
           <Doughnut options={{ ...base, cutout: '68%', plugins: { ...base.plugins, legend: { display: true, position: 'bottom', labels: { boxWidth: 10, usePointStyle: true } } } }}
-            data={{ labels: s.byStatus.map((x) => STATUS_LABEL[x.status] ?? x.status), datasets: [{ data: s.byStatus.map((x) => x.count), backgroundColor: s.byStatus.map((x) => STATUS_COLOR[x.status] ?? '#8e8e93'), borderColor: '#1c1c1e', borderWidth: 3 }] }} />
+            data={{ labels: s.byStatus.map((x) => STATUS_LABEL[x.status] ?? x.status), datasets: [{ data: s.byStatus.map((x) => x.count), backgroundColor: s.byStatus.map((x) => STATUS_COLOR[x.status] ?? '#8e8e93'), borderColor: '#141416', borderWidth: 3 }] }} />
         </Panel>
         <Panel title="Nouveaux utilisateurs par mois">
           <Bar options={{ ...base, scales: { x: { grid: { display: false }, border: { display: false } }, y: { ...grid, beginAtZero: true, ticks: { precision: 0 } } } }}
-            data={{ labels: s.newUsers.map((m) => m.month), datasets: [{ data: s.newUsers.map((m) => m.count), backgroundColor: '#bf5af2', borderRadius: 8, maxBarThickness: 34 }] }} />
+            data={{ labels: s.newUsers.map((m) => m.month), datasets: [{ data: s.newUsers.map((m) => m.count), backgroundColor: '#8fa0ff', borderRadius: 8, maxBarThickness: 34 }] }} />
         </Panel>
       </div>
     </>

@@ -18,6 +18,8 @@ public static class Seeder
             }
         }
 
+        await BookContents.ApplyAsync(db);
+
         if (await db.Users.AnyAsync()) return;
         var rnd = new Random(42);
         var now = DateTime.UtcNow;
@@ -104,26 +106,23 @@ public static class Seeder
         await db.SaveChangesAsync();
 
         var c1 = new Comment { PublicationId = p2.Id, UserId = readers[1].Id, Content = "Entièrement d'accord sur les chapitres de Tanger, magnifiques.", CommentedAt = now.AddDays(-2) };
-        var c2 = new Comment { PublicationId = p1.Id, UserId = readers[4].Id, Content = "Pareil pour moi : la nuit, je lis plus lentement et je retiens davantage.", CommentedAt = now.AddDays(-5) };
+        var c2 = new Comment { PublicationId = p1.Id, UserId = readers[4].Id, Content = "Pareil pour moi : la nuit, je lis trois fois plus lentement et je retiens chaque phrase.", CommentedAt = now.AddDays(-5) };
         db.Comments.AddRange(c1, c2);
         await db.SaveChangesAsync();
-        var r1 = new Comment { PublicationId = p2.Id, UserId = readers[2].Id, ParentId = c1.Id, Content = "Merci ! Tu as lu la fin ?", CommentedAt = now.AddDays(-2).AddHours(3) };
-        var spam = new Comment { PublicationId = p3.Id, UserId = readers[5].Id, Content = "Gagnez de l'argent facilement sur mon site !!!", CommentedAt = now.AddHours(-10) };
-        db.Comments.AddRange(r1, spam);
+
+        var reply = new Comment { PublicationId = p2.Id, ParentId = c1.Id, UserId = readers[2].Id, Content = "Merci ! J'ai adoré l'ambiance de ce quartier.", CommentedAt = now.AddDays(-1) };
+        db.Comments.Add(reply);
+
+        db.Reports.Add(new Report
+        {
+            Reason = "Propos hors-sujet à vérifier par la modération.",
+            ReporterId = readers[1].Id,
+            CommentId = c2.Id,
+            Status = ReportStatus.Open,
+            ReportedAt = now.AddHours(-12)
+        });
         await db.SaveChangesAsync();
-        db.Reports.Add(new Report { CommentId = spam.Id, ReporterId = readers[3].Id, Reason = "Publicité indésirable", ReportedAt = now.AddHours(-8) });
-        await db.SaveChangesAsync();
-        logger.LogInformation("Base initialisée avec des données de démonstration.");
     }
 
-    private static string SampleText(string title, string author)
-    {
-        var chapters = new[]
-        {
-            ("Chapitre 1 — Ouverture", $"Il existe des livres que l'on ouvre par curiosité et que l'on referme transformé. « {title} » de {author} appartient à cette famille. Dès les premières lignes, le ton est donné : une écriture claire, attentive aux détails, qui prend le temps d'installer son monde.\n\nLe lecteur y trouve d'abord un décor, puis des personnages, puis des questions. Chaque page répond à l'une et en soulève deux autres, de sorte que la lecture avance par petites découvertes plutôt que par grandes révélations."),
-            ("Chapitre 2 — Développement", "Au fil des chapitres, le propos s'élargit. Ce qui semblait anecdotique devient central ; ce qui paraissait essentiel s'efface. Le texte alterne les passages denses et les respirations, comme une marche en terrain varié.\n\nOn aimerait citer ici de longs extraits, mais l'essentiel tient peut-être dans cette impression : celle d'une voix qui s'adresse à nous sans jamais nous presser."),
-            ("Chapitre 3 — Conclusion", "Arrive enfin le moment où tout se rassemble. Les fils posés au début se nouent, non pas de façon spectaculaire, mais avec la douceur d'une évidence retrouvée.\n\nOn referme le livre, on regarde un instant par la fenêtre, et l'on se surprend à relire mentalement la première phrase. C'est sans doute le signe qu'un livre a bien fait son travail."),
-        };
-        return string.Join("\n\n", chapters.Select(c => $"{c.Item1}\n\n{c.Item2}"));
-    }
+    private static string SampleText(string title, string author) => $"{title}\n{author}\n\nChapitre 1 — Ouverture\nContenu initial.";
 }

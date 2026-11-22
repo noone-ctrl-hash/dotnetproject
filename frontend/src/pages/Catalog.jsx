@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api.js'
-import { BookCard, Empty, Spinner } from '../components/ui.jsx'
+import { Link } from 'react-router-dom'
+import { BookCard, Cover, Empty, SkeletonGrid, Tilt, coverGlow } from '../components/ui.jsx'
+import { money } from '../api.js'
 
 export default function Catalog() {
   const [books, setBooks] = useState(null)
@@ -10,23 +12,37 @@ export default function Catalog() {
   const [free, setFree] = useState('')
   const [sort, setSort] = useState('')
   const [error, setError] = useState('')
+  const [featured, setFeatured] = useState(null)
 
   useEffect(() => { api.get('/categories').then(setCats).catch(() => {}) }, [])
   useEffect(() => {
     const t = setTimeout(() => {
-      api.get(`/books${api.qs({ search, categoryId, free, sort })}`).then(setBooks).catch((e) => setError(e.message))
+      api.get(`/books${api.qs({ search, categoryId, free, sort })}`).then((b) => { setBooks(b); setFeatured((f) => f ?? b[0] ?? null) }).catch((e) => setError(e.message))
     }, 220)
     return () => clearTimeout(t)
   }, [search, categoryId, free, sort])
 
   return (
     <>
-      <section className="hero">
-        <h1>Lisez ce qui vous ressemble.</h1>
-        <p>Des romans, des sciences, de l’histoire et de la technologie. Gratuits ou à l’unité, toujours accessibles depuis votre bibliothèque.</p>
-        <div className="search">
-          <input type="search" placeholder="Rechercher un titre, un auteur…" value={search} onChange={(e) => setSearch(e.target.value)} aria-label="Rechercher un livre" />
+      <section className={`hero ${featured ? '' : 'solo'}`}>
+        <div className="hero-copy">
+          <h1 style={{ '--i': 0 }}>Lisez ce qui vous ressemble.</h1>
+          <p className="hero-sub" style={{ '--i': 1 }}>Des romans, des sciences, de l’histoire et de la technologie. Gratuits ou à l’unité, toujours accessibles depuis votre bibliothèque.</p>
+          <div className="search" style={{ '--i': 2 }}>
+            <input type="search" placeholder="Rechercher un titre, un auteur…" value={search} onChange={(e) => setSearch(e.target.value)} aria-label="Rechercher un livre" />
+          </div>
         </div>
+        {featured && (
+          <div className="spotlight">
+            <div className="spot-glow" style={coverGlow(featured)} />
+            <Link to={`/livres/${featured.id}`} aria-label={featured.title}><Tilt><Cover book={featured} size="lg" /></Tilt></Link>
+            <div className="spot-info">
+              <strong className="spot-title">{featured.title}</strong>
+              <span className="spot-author">{featured.author}</span>
+              <Link className="btn primary" to={`/livres/${featured.id}`}>{featured.isFree ? 'Lire gratuitement' : `Découvrir · ${money(featured.price)}`}</Link>
+            </div>
+          </div>
+        )}
       </section>
 
       <div className="filters">
@@ -51,7 +67,7 @@ export default function Catalog() {
       </div>
 
       {error && <div className="error">{error}</div>}
-      {!books ? <Spinner /> : books.length === 0 ? (
+      {!books ? <SkeletonGrid /> : books.length === 0 ? (
         <Empty title="Aucun livre trouvé" hint="Essayez un autre mot-clé ou retirez un filtre." />
       ) : (
         <div className="grid">{books.map((b) => <BookCard key={b.id} book={b} />)}</div>
